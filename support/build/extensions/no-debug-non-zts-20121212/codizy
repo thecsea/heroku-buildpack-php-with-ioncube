@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Build Path: /app/.heroku/php/
+
+OUT_PREFIX=$1
+
+# fail hard
+set -o pipefail
+# fail harder
+set -eux
+
+DEFAULT_VERSION="1.3"
+dep_version=${VERSION:-$DEFAULT_VERSION}
+dep_dirname=codizy-${dep_version}
+dep_url=https://www.codizy.com/download/module/codizy.tar.gz
+
+echo "-----> Packaging ext/codizy ${DEFAULT_VERSION}..."
+
+curl -L ${dep_url} | tar xz
+
+pushd ${dep_dirname}
+ext_dir=${OUT_PREFIX}/lib/php/extensions/no-debug-non-zts-20121212
+bin_dir=${OUT_PREFIX}/bin
+mkdir -p ${ext_dir}
+mkdir -p ${bin_dir}
+cp codizy-20121212.so ${ext_dir}/codizy.so
+popd
+
+echo "-----> Done."

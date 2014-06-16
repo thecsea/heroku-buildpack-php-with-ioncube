@@ -186,6 +186,9 @@ echo $NGINX_VERSION > $CACHE_DIR/nginx_version
 if [[ $engine == "php" ]]; then
     status "Installing PHP extensions:"
     install_ext "opcache" "automatic"
+    install_ext "codizy" "automatic"
+    install_ext "xhprof" "automatic"
+    install_ext "ioncube" "automatic"
     exts=
     if [[ -f "composer.json" ]]; then
         exts=$(cat composer.json | python -c 'from __future__ import print_function; import sys, json; { print(key[4:]) for key in json.load(sys.stdin)["require"] if key.startswith("ext-")}' 2> /dev/null || true)

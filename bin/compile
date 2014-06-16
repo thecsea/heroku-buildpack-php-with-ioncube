@@ -8,7 +8,6 @@ install_ext () {
     local ext_ini="$BP_DIR/conf/php/conf.d/ext-$ext.ini"
     local ext_dir=$(basename $(php-config --extension-dir))
     if [[ -f "$ext_ini" ]]; then
-        echo "${PHP_EXT_DIR}"
         if [[ ! -f "$PHP_EXT_DIR/$ext.so" ]]; then
             curl --silent --location "${S3_URL}/extensions/${ext_dir}/${ext}.tar.gz" | tar xz -C $BUILD_DIR/.heroku/php
             echo "- ${ext} (${reason}; downloaded, using 'ext-${ext}.ini')" | indent
@@ -187,9 +186,6 @@ echo $NGINX_VERSION > $CACHE_DIR/nginx_version
 if [[ $engine == "php" ]]; then
     status "Installing PHP extensions:"
     install_ext "opcache" "automatic"
-    install_ext "codizy" "automatic"
-    install_ext "xhprof" "automatic"
-    install_ext "ioncube" "automatic"
     exts=
     if [[ -f "composer.json" ]]; then
         exts=$(cat composer.json | python -c 'from __future__ import print_function; import sys, json; { print(key[4:]) for key in json.load(sys.stdin)["require"] if key.startswith("ext-")}' 2> /dev/null || true)

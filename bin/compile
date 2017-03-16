@@ -2,37 +2,6 @@
 
 # bin/compile <build-dir> <cache-dir> <env-dir>
 
-install_ext () {
-    local ext=$1
-    local reason=${2:-}
-    local custom_url=${3:-}
-    local ext_ini="$BP_DIR/conf/php/conf.d/ext-$ext.ini"
-    local ext_so=
-    local ext_dir=$(basename $(php-config --extension-dir))
-    if [[ -f "$ext_ini" ]]; then
-        ext_so=$(php -r '$ini=parse_ini_file("'$ext_ini'"); echo $ext=$ini["zend_extension"]?:$ini["extension"]; exit((int)empty($ext));') # read .so name from .ini because e.g. opcache.so is named "zend-opcache"
-        if [[ ! -f "$PHP_EXT_DIR/$ext_so" ]]; then
-            if [[ -z "$custom_url" ]]; then
-              curl --silent --location "${S3_URL}/extensions/${ext_dir}/${ext}.tar.gz" | tar xz -C $BUILD_DIR/.heroku/php
-            else
-              curl --silent --location "$custom_url" | tar xz -C $BUILD_DIR/.heroku/php
-            fi
-
-            echo "- ${ext} (${reason}; downloaded)" | indent
-        else
-            echo "- ${ext} (${reason}; bundled)" | indent
-        fi
-        cp "${ext_ini}" "${BUILD_DIR}/.heroku/php/etc/php/conf.d"
-    elif [[ -f "${PHP_EXT_DIR}/${ext}.so" ]]; then
-        echo "extension = ${ext}.so" > "${BUILD_DIR}/.heroku/php/etc/php/conf.d/ext-${ext}.ini"
-        echo "- ${ext} (${reason}; bundled)" | indent
-    elif echo -n ${ext} | php -r 'exit((int)!extension_loaded(file_get_contents("php://stdin")));'; then
-        : # echo "- ${ext} (${reason}; enabled by default)" | indent
-    else
-        warning_inline "Unknown extension ${ext} (${reason}), install may fail!"
-    fi
-}
-
 # fail hard
 set -o pipefail
 # fail harder
@@ -332,3 +301,5 @@ install_newrelic_userini
 # done with platform installs; restore COMPOSER from previous value
 export COMPOSER="$COMPOSER_bak"
 unset COMPOSER_bak
+
+install_ioncube_ext

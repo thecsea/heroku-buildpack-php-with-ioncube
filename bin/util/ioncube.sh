@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 install_ioncube_ext() {
-  local series= 
+  local series=
+  local ZEND_MODULE_API_VERSION=$(basename $(dirname $0))
+  ZEND_MODULE_API_VERSION=${ZEND_MODULE_API_VERSION#no-debug-non-zts-}
   case ${ZEND_MODULE_API_VERSION} in
   	20121212)
   		series=5.5

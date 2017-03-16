@@ -2,6 +2,7 @@
 
 install_ioncube_ext() {
   local series=
+  echo $1
   local ZEND_MODULE_API_VERSION=$(basename $(dirname $0))
   ZEND_MODULE_API_VERSION=${ZEND_MODULE_API_VERSION#no-debug-non-zts-}
   case ${ZEND_MODULE_API_VERSION} in
